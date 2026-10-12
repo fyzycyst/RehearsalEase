@@ -19,6 +19,7 @@ export function mountRehearsal(root,{runtime,readiness,install,mode='voice-only'
  const prepare=el('section'),rehearse=el('section'),review=el('section');root.append(prepare,rehearse,review);
  const show=screen=>{for(const s of [prepare,rehearse,review])s.hidden=s!==screen;status.hidden=screen===rehearse;};
  prepare.append(el('h2','Make room for your words'),el('p','Use desktop Chrome with on-device English. Paste your script and choose a target. Check local English; if needed, explicitly Download English pack, then Start rehearsal. Everything stays in this session.','intro'));
+ const requirements=el('p','Requires desktop Chrome • English speech recognition.','requirements');requirements.setAttribute('role','note');prepare.append(requirements);
  const raw=el('textarea');raw.rows=9;raw.value=sentences.join('\n\n');raw.spellcheck=false;
  prepare.append(field('Your script · plain text or Markdown',raw));
  const controls=el('div',undefined,'controls'),minutes=input('text','2'),seconds=input('text','00');
