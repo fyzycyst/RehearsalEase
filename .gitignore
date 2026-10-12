@@ -1,0 +1,7 @@
+deploy/
+.vercel/
+node_modules/
+reports/
+coverage/
+*.log
+.DS_Store

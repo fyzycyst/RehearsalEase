@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as script from './script.mjs';
+test('Markdown becomes readable spoken text without link destinations',()=>assert.deepEqual(script.prepareScript('# Hello\n\n- **Welcome** to [our studio](https://example.com).\n- _Read_ now.'),{text:'Hello\n\nWelcome to our studio.\nRead now.',sentences:['Hello','Welcome to our studio.','Read now.']}));
+test('fenced code stays readable text',()=>assert.equal(script.prepareScript('```js\nconst answer = 42;\n```').text,'const answer = 42;'));
+test('HTML remains literal text with no renderer',()=>assert.equal(script.prepareScript('<img src="https://example.com/a">Hello</img>').text,'<img src="https://example.com/a">Hello</img>'));
+test('blank input has no sentences',()=>assert.deepEqual(script.prepareScript(' \n\t'),{text:'',sentences:[]}));
+test('paragraphs and sentence punctuation form boundaries',()=>assert.deepEqual(script.prepareScript('First sentence. Second sentence!\n\nUnpunctuated paragraph\n\nLast.').sentences,['First sentence.','Second sentence!','Unpunctuated paragraph','Last.']));
+test('duration defaults and positive integers are valid',()=>{assert.equal(script.parseTarget('2','0'),120);assert.equal(script.parseTarget('0','59'),59);});
+test('invalid duration cannot start rehearsal',()=>{for(const pair of [['','0'],['2',''],['1.5','0'],['-1','0'],['0','-1'],['0','60'],['0','0'],['abc','1']]) assert.equal(script.parseTarget(...pair),null);});
+test('soft-wrapped prose remains a single sentence',()=>assert.deepEqual(script.prepareScript('This sentence wraps\nonto another line.').sentences,['This sentence wraps onto another line.']));
+test('balanced link and image destinations disappear completely',()=>assert.equal(script.prepareScript('[Guide](https://example.com/a_(b)/private) and ![Diagram](https://example.com/(nested(foo)).png)').text,'Guide and Diagram'));
+test('unclosed link destination is preserved without partial consumption',()=>assert.equal(script.prepareScript('[Guide](https://example.com/(private)').text,'[Guide](https://example.com/(private)'));
+test('literal intraword underscores survive while underscore emphasis is removed',()=>assert.equal(script.prepareScript('Use first_name_last and first__name__last. _Read_ __now__.').text,'Use first_name_last and first__name__last. Read now.'));
+test('inline code preserves formatting characters and link syntax as content',()=>assert.equal(script.prepareScript('Use `first_name_last` and `**literal** [x](private)` now.').text,'Use first_name_last and **literal** [x](private) now.'));

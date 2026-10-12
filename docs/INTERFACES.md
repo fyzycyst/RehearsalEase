@@ -1,0 +1,12 @@
+# RehearsalEase interfaces
+
+- `prepareScript(raw)` returns `{text,sentences}`; render with textContent only. `parseTarget(minutes,seconds)` returns positive seconds or null.
+- `createVoiceRuntime({Recognition,mediaDevices,createAudioContext,...})` returns start/stop. Local English and processLocally:true are required; no fallback/retry. Tracks stop synchronously before bounded recognition finalization.
+- `createSession({runtime,mode,now,onChange,...})` returns start({script,targetSeconds}), setPosition(index), finish(reason), reset(). Changes expose preparing/rehearsing/stopping/review, position, status and immutable run results. finish reasons: finished/stopped/interrupted.
+- `summarizeRun(run)` returns actualSeconds, targetSeconds, deltaSeconds, nullable approximate paceWpm, quiet, welcoming copy and availability notes.
+- `mountRehearsal(root,{runtime,readiness,install,mode,simulation,now})` mounts shared UI. Generic mount defaults to voice-only; the primary entry explicitly selects local shared-track. Tests can inject synthetic adapters and a simulation label.
+- `installEnglishPack(Recognition)` explicitly installs with processLocally:true and rechecks local availability; it never starts recognition.
+
+Transcript: `{sessionId,index,text,final}`. Run: `{script,targetSeconds,elapsedMs,reason,segments,quiet,acousticAvailable,recognitionComplete,microphoneCleanup}`. Quiet metadata is relative time plus approximate nullable sentence ID; audio/RMS is transient. See individual module tests for matching/quiet boundaries and lifecycle contracts.
+
+Runtime stop returns `recognitionComplete` independently from optional `microphoneCleanup: {confirmed,tracksEnded,samplingCancelled,contextCloseRequested}`. Confirmation requires a nonempty set of app-owned tracks observed ended after stop, successful sampling cancellation, no pending acquisition, and no observed cleanup error. Best-effort cleanup continues across resource failures. `contextCloseRequested` records a request only; no completed-close or hardware state claim is made. A close rejection observed before stop resolves invalidates confirmation. Session copies the outcome into that Run, defaults missing/rejected/timed-out stop to `{confirmed:false}`, and never reuses another Run's result. Voice-only has no owned track verification and is unconfirmed. Review displays “Microphone input stopped.” only for explicit confirmation outside simulation; otherwise it displays “Microphone shutdown not confirmed. Check Chrome’s microphone indicator.” Simulation diagnostics remain prominent.
