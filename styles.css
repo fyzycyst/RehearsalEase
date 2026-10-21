@@ -2,3 +2,4 @@
 
 .rehearsal-toolbar{position:sticky;top:0;z-index:2;background:#111c1d;padding:12px 0 16px;border-bottom:1px solid #42534e}.rehearsal-toolbar .status{margin:0 0 8px}.rehearsal-toolbar .controls{margin:0}
 .requirements{margin:20px 0;padding:14px 18px;border:1px solid var(--accent);border-left-width:4px;border-radius:4px;background:#263c30;color:#f4ffe9;font-weight:650}
+.site-footer{margin-top:48px;padding-top:16px;border-top:1px solid #42534e;color:var(--muted);font-size:14px}.site-footer a{color:inherit;text-underline-offset:2px}

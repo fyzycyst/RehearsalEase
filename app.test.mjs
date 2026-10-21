@@ -142,3 +142,16 @@ for(const [confirmed,simulation,message] of [[true,false,'Microphone input stopp
  await session.start({script:['Hello.'],targetSeconds:60});await session.finish();
  assert.ok(walk(root).some(n=>n.textContent===message));
 });
+test('footer links to the studio privacy policy and steps aside during a rehearsal',async()=>{
+ const root=new Node('div');
+ mountRehearsal(root,{runtime:{start:async()=>({acousticAvailable:false}),stop:async()=>({recognitionComplete:true})},readiness:async()=>'available',install:async()=>'available'});
+ const visible=node=>node.hidden?[]:[node,...node.children.flatMap(visible)];
+ const footer=root.children.find(n=>n.tagName==='footer');
+ assert.ok(footer,'a footer is mounted');
+ const link=walk(footer).find(n=>n.tagName==='a');
+ assert.equal(link.textContent,'Privacy');
+ assert.equal(link.href,'https://ftlenterprises.us/privacy#rehearsalease','links to the RehearsalEase section of the studio policy');
+ assert.ok(visible(root).includes(link),'visible while preparing');
+ await invoke(root,'Check local English');await invoke(root,'Start rehearsal');
+ assert.ok(!visible(root).includes(link),'hidden while rehearsing, like the status line');
+});
