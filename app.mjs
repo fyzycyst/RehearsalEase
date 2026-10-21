@@ -17,7 +17,9 @@ export function mountRehearsal(root,{runtime,readiness,install,mode='voice-only'
  if(simulation)root.append(el('aside','SIMULATION — synthetic input only. No microphone, real recognition, or live acoustic verification.','simulation'));
  const status=el('p','Ready to prepare','status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');root.append(status);
  const prepare=el('section'),rehearse=el('section'),review=el('section');root.append(prepare,rehearse,review);
- const show=screen=>{for(const s of [prepare,rehearse,review])s.hidden=s!==screen;status.hidden=screen===rehearse;};
+ // The studio-wide privacy policy has a RehearsalEase section; like the status line, the footer steps aside while rehearsing.
+ const footer=el('footer',undefined,'site-footer'),privacy=el('a','Privacy');privacy.href='https://ftlenterprises.us/privacy#rehearsalease';footer.append(privacy);root.append(footer);
+ const show=screen=>{for(const s of [prepare,rehearse,review])s.hidden=s!==screen;status.hidden=footer.hidden=screen===rehearse;};
  prepare.append(el('h2','Make room for your words'),el('p','Use desktop Chrome with on-device English. Paste your script and choose a target. Check local English; if needed, explicitly Download English pack, then Start rehearsal. Everything stays in this session.','intro'));
  const requirements=el('p','Requires desktop Chrome • English speech recognition.','requirements');requirements.setAttribute('role','note');prepare.append(requirements);
  const raw=el('textarea');raw.rows=9;raw.value=sentences.join('\n\n');raw.spellcheck=false;
